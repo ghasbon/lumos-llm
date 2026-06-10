@@ -1,5 +1,6 @@
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from proxy import proxy_handler
 
 # ---- Logging setup ----
 logging.basicConfig(
@@ -16,7 +17,6 @@ app = FastAPI(title="Lumos")
 async def startup_event():
     logger.info("Lumos starting 🚀")
 
-@app.get("/health")
-async def health():
-    logger.info("Health check requested")
-    return {"status": "ok"}
+@app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+async def proxy(request: Request, path: str):
+    return await proxy_handler(request, path)
